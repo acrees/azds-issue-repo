@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "azds-issue-repo.fullname" . }}
+  labels:
+    app: {{ template "azds-issue-repo.name" . }}
+    chart: {{ template "azds-issue-repo.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "azds-issue-repo.name" . }}
+    release: {{ .Release.Name }}

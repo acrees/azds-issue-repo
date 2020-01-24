@@ -1,0 +1,19 @@
+FROM mcr.microsoft.com/dotnet/core/sdk:3.1
+ARG BUILD_CONFIGURATION=Debug
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV ASPNETCORE_URLS=http://+:80
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+EXPOSE 80
+
+WORKDIR /build
+COPY ["azds-issue-repo.sln", "."]
+COPY ["src/domain/domain.csproj", "./src/domain/domain.csproj"]
+COPY ["src/web/web.csproj", "./src/web/web.csproj"]
+COPY ["test/domain.test/domain.test.csproj", "./test/domain.test/domain.test.csproj"]
+RUN dotnet restore
+COPY . .
+RUN dotnet build src/web --no-restore -c $BUILD_CONFIGURATION
+
+RUN echo "exec dotnet run --no-build --no-launch-profile -c $BUILD_CONFIGURATION -- \"\$@\"" > /entrypoint.sh
+
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]
